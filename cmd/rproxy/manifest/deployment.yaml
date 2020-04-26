@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rproxy
+  labels:
+    app: rproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rproxy
+  template:
+    metadata:
+      labels:
+        app: rproxy
+    spec:
+      containers:
+        - name: rproxy
+          image: docker.io/leoh0/rproxy:latest
+          imagePullPolicy: Always
+          ports:
+            - name: proxy
+              containerPort: 8080
+          # TODO: Add args ...
+          env:
+            - name: HTTP_PROXY
+              value: "%{proxy}"
+            - name: HTTPS_PROXY
+              value: "%{proxy}"
+            - name: http_proxy
+              value: "%{proxy}"
+            - name: https_proxy
+              value: "%{proxy}"

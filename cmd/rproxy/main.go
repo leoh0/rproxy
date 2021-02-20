@@ -61,21 +61,21 @@ func (f *defaultFieldsFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	})
 }
 
-// type proxyTransport struct {
-// 	http.RoundTripper
-// }
+type proxyTransport struct {
+	http.RoundTripper
+}
 
-// func (t *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-// 	response, err := t.RoundTripper.RoundTrip(request)
-// 	body, err := httputil.DumpResponse(response, true)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (t *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	response, err := t.RoundTripper.RoundTrip(request)
+	body, err := httputil.DumpResponse(response, true)
+	if err != nil {
+		return nil, err
+	}
 
-// 	logrus.Info(string(body))
+	logrus.Info(string(body))
 
-// 	return response, err
-// }
+	return response, err
+}
 
 func flagOptions() *options {
 	o := &options{}
@@ -123,6 +123,6 @@ func newReverseProxy(upstreamURL *url.URL, timeout time.Duration) http.Handler {
 		director(req)
 		req.Host = req.URL.Host
 	}
-	// proxy.Transport = &proxyTransport{http.DefaultTransport}
+	proxy.Transport = &proxyTransport{http.DefaultTransport}
 	return http.TimeoutHandler(proxy, timeout, fmt.Sprintf("rproxy timed out after %v", timeout))
 }
